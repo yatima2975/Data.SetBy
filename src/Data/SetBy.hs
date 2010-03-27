@@ -33,6 +33,9 @@
 -- 'union' or 'insert'.  Of course, left-biasing can only be observed
 -- when equality is an equivalence relation instead of structural
 -- equality.
+-- 
+-- When combining two sets, the comparison function from the left set
+-- is used. 
 -----------------------------------------------------------------------------
 
 module Data.SetBy  ( 
