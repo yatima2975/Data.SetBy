@@ -215,6 +215,10 @@ empty cmp = Set cmp $ empty'
 empty'
   = Tip
 
+-- | /O(1)/. The empty set, with default ordering
+emptyOrd :: Ord a => Set a
+emptyOrd = empty compare
+ 
 -- | /O(1)/. Create a singleton set.
 singleton :: Order a -> a -> Set a
 singleton cmp x 
@@ -222,6 +226,10 @@ singleton cmp x
 singleton' x 
   = Bin 1 x Tip Tip
 
+-- | /O(1)/. Create a singleton set, with default ordering
+singletonOrd :: Ord a => a -> Set a
+singletonOrd = singleton compare  
+  
 {--------------------------------------------------------------------
   Insertion, Deletion
 --------------------------------------------------------------------}
@@ -319,6 +327,9 @@ unions cmp ts
 -- | The union of a non-empty list of sets (so we don't have to pass in an Order)
 unions1 :: [Set a] -> Set a
 unions1 (t:ts) = foldlStrict union t ts
+
+unionsOrd :: Ord a => [Set a] -> Set a
+unionsOrd = unions compare
 
 -- | /O(n+m)/. The union of two sets, preferring the first set when
 -- equal elements are encountered.
@@ -434,6 +445,8 @@ partition' p (Bin _ x l r)
 map :: Order b -> (a->b) -> Set a -> Set b
 map cmpB f = fromList cmpB . List.map f . toList
 
+mapOrd :: Ord b => (a -> b) -> Set a -> Set b
+mapOrd = map compare
 -- | /O(n)/. The 
 --
 -- @'mapMonotonic' f s == 'map' f s@, but works only when @f@ is monotonic.
@@ -450,7 +463,8 @@ mapMonotonic' _ Tip = Tip
 mapMonotonic' f (Bin sz x l r) =
     Bin sz (f x) (mapMonotonic' f l) (mapMonotonic' f r)
 
-
+mapMonotonicOrd :: Ord b => (a -> b) -> Set a -> Set b
+mapMonotonicOrd = mapMonotonic compare
 {--------------------------------------------------------------------
   Fold
 --------------------------------------------------------------------}
@@ -495,6 +509,8 @@ fromList' cmp xs
   where
     ins t x = insert' cmp x t
 
+fromListOrd :: Ord a => [a] -> Set a
+fromListOrd = fromList compare	
 {--------------------------------------------------------------------
   Building trees from ascending/descending lists can be done in linear time.
   
@@ -520,6 +536,8 @@ fromAscList' cmp xs
     | cmp z x == EQ      =   combineEq' z xs'
     | otherwise = z:combineEq' x xs'
 
+fromAscListOrd :: Ord a => [a] -> Set a
+fromAscListOrd = fromAscList compare
 
 -- | /O(n)/. Build a set from an ascending list of distinct elements in linear time.
 -- /The precondition (input list is strictly ascending wrt the order) is not checked./
@@ -544,6 +562,9 @@ fromDistinctAscList' xs
     buildR _ _ _ []     = error "fromDistinctAscList buildR []"
     buildB l x c r zs   = c (bin' x l r) zs
 
+fromDistinctAscListOrd :: Ord a => [a] -> Set a 
+fromDistinctAscListOrd = fromDistinctAscList compare
+	
 {--------------------------------------------------------------------
   Eq converts the set to a list. In a lazy setting, this 
   actually seems one of the faster methods to compare two trees 
